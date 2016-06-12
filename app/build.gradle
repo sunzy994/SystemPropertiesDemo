@@ -24,4 +24,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
+    // 通过引用layoutlib可以直接调用到 SystemProperties
+    provided files("/home/sunzy/develop/android-sdk-linux/android-sdk-linux/platforms/android-23/data/layoutlib.jar")
 }

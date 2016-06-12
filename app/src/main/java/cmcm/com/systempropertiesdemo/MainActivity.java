@@ -5,9 +5,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.lang.reflect.Method;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,38 +18,42 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //SystemProperties.get();
+        //canWeSetSystemProperty();
+        canWeSetSystemProperty2();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    // 通过反射调用 SystemProperties 是可以的
+    private void invokeSystemPropertiesByReflection(){
+        try {
+            Class<?> threadClazz = Class.forName("android.os.SystemProperties");
+            Method method = threadClazz.getMethod("get", String.class);
+            Log.v("sunzy", "result = " + method.invoke(null, "ro.product.device"));
+        } catch (Exception e){
+            Log.wtf("sunzy", e);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    // 我们不能改动系统属性
+    private void canWeSetSystemProperty(){
+        try {
+            Class<?> threadClazz = Class.forName("android.os.SystemProperties");
+            Method method = threadClazz.getMethod("set", String.class, String.class);
+            Log.v("sunzy", "result = " + method.invoke(null, "ro.product.device", "dddd"));
+        } catch (Exception e){
+            Log.wtf("sunzy", e);
+        }
+    }
+
+    //wlan.driver.status 这个也不能改
+    private void canWeSetSystemProperty2(){
+        try {
+            Class<?> threadClazz = Class.forName("android.os.SystemProperties");
+            Method method = threadClazz.getMethod("set", String.class, String.class);
+            Log.v("sunzy", "result = " + method.invoke(null, "wlan.driver.status", "dddd"));
+        } catch (Exception e){
+            Log.wtf("sunzy", e);
+        }
     }
 }
